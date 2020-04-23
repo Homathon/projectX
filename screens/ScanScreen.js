@@ -1,45 +1,78 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Platform } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { MonoText } from '../components/StyledText';
+import {
+  Text,
+  View,
+  StyleSheet, Alert, TouchableOpacity,
+  Image, Button
+} from 'react-native';
+import { Camera } from 'expo-camera';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 export default function HomeScreen() {
+  const [hasPermission, setHasPermission] = React.useState(null);
+  const [scanned, setScanned] = React.useState(false);
+  const db = [{ 'code': 6281022180251, 'text': "حليب صافيو - 1.0 ر.س" },
+  { 'code': '-dQ5HyTuSP', 'text': "حليب صافيو - 1.0 ر.س" }]
+  React.useEffect(() => {
+    (async () => {
+      const { status } = await BarCodeScanner.requestPermissionsAsync();
+      setHasPermission(status === 'granted');
+    })();
+  }, []);
+
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    for (x in db) {
+      // alert()
+      if (db[x]['code'] == data.substring(data.indexOf('-')))
+        alert(` ${db[x]['text']}`);
+    }
+  };
+
+  if (hasPermission === null) {
+    return <Text>Requesting for camera permission</Text>;
+  }
+  if (hasPermission === false) {
+    return <Text>No access to camera</Text>;
+  }
+
+
+  // this.handleTourch = this.handleTourch.bind(this);
+  // const [torchOn, setTorchOn] = React.useState(false)
+
+  // onBarCodeRead = (e) => {
+  //   Alert.alert("Barcode value is" + e.data, "Barcode type is" + e.type);
+  // }
+
+  // handleTourch = (value) => {
+  //   if (value === true) {
+  //     setTorchOn(false);
+  //     RNCamera.Constants.FlashMode.on
+  //   } else {
+  //     setTorchOn(true);
+  //     RNCamera.Constants.FlashMode.off
+  //   }
+  // }
+
+
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.welcomeContainer}>
-          <Image
-            source={
-              __DEV__
-                ? require('../assets/images/robot-prod.png')
-                : require('../assets/images/robot-prod.png')
-            }
-            style={styles.welcomeImage}
-          />
-        </View>
+    <View
+      style={{
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+      }}>
+      <BarCodeScanner
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        style={StyleSheet.absoluteFillObject}
+      />
 
-        <View style={styles.getStartedContainer}>
-          <DevelopmentModeNotice />
-
-          <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
-
-          <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-            <MonoText>screens/HomeScreen.js</MonoText>
-          </View>
-
-          <Text style={styles.getStartedText}>
-            هناا نحط الفواتير 
-          </Text>
-        </View>
-
-        <View style={styles.helpContainer}>
-          <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-
+      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
     </View>
   );
 }
