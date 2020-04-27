@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "projectX",
+    "name": "Fast Track",
     "slug": "projectX",
     "platforms": [
       "ios",
@@ -9,7 +9,7 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app.png",
     "scheme": "myapp",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -23,7 +23,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.fasttrack.fasttrack"
     }
   }
 }

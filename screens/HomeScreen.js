@@ -1,46 +1,74 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import { ScrollView, Directions } from 'react-native-gesture-handler';
 import { MonoText } from '../components/StyledText';
+import TouchableScale from 'react-native-touchable-scale'; // https://github.com/kohver/react-native-touchable-scale
+// import LinearGradient from 'react-native-linear-gradient'; // Only if no expo
+import { LinearGradient } from 'expo-linear-gradient';
+import { Card, ListItem, Button, Icon } from 'react-native-elements'
+import BillContext from '../BillContext'
+
 
 export default function HomeScreen() {
+
+  const { list, setList } = React.useContext(BillContext)
+
+  let total = 0
+  list.map((l, i) => (
+    total += l.price * l.quntity
+  ))
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <View style={styles.welcomeContainer}>
-          <Image
-            source={
-              __DEV__
-                ? require('../assets/images/robot-prod.png')
-                : require('../assets/images/robot-prod.png')
-            }
-            style={styles.welcomeImage}
+    <View>
+      <ScrollView style={{minHeight:645}}>
+        {/* {
+        list.map((l, i) => (
+          <ListItem
+            Component={TouchableScale}
+            activeScale={0.95} //
+            linearGradientProps={{
+              colors: ['#FF9800', '#F44336'],
+              start: [1, 0],
+              end: [0.2, 0],
+            }}
+            // ViewComponent={LinearGradient} // Only if no expo
+            rightTitle={l.name}
+            rightTitleStyle={{ color: 'white', fontWeight: 'bold' }}
+            rightSubtitleStyle={{ color: 'white' }}
+            rightSubtitle={l.subtitle}
           />
-        </View>
+        ))
+      } */}
 
-        <View style={styles.getStartedContainer}>
-          <DevelopmentModeNotice />
 
-          <Text style={styles.getStartedText}>Open up the code for this screen:</Text>
+        {
+          list.map((l, i) => (
+            <Card containerStyle={{ padding: 0, borderRadius: 20, }} >
+              <ListItem
+              containerStyle={{borderRadius: 20, }}
+                key={i}
+                friction={90}
+                tension={100}// These props are passed to the parent component (here TouchableScale)
+                rightAvatar={{ rounded: false, source: l.avatar_url }}
+                rightTitle={l.name}
+                rightTitleStyle={{ width: 200, textAlign: 'right' }}
+                subtitle={l.price * l.quntity + ' ر.س'}
+                rightSubtitle={l.price + ' ر.س'}
+                avatar={{ uri: l.avatar }}
+                badge={{ value: l.quntity, status: 'success', containerStyle: { position: 'absolute', top: -4, right: -4 } }}
+                // containerStyle={{ margin: 50, backgroundColor:'red' }}
+                bottomDivider
+              />
+            </Card>
 
-          <View style={[styles.codeHighlightContainer, styles.homeScreenFilename]}>
-            <MonoText>screens/HomeScreen.js</MonoText>
-          </View>
-
-          <Text style={styles.getStartedText}>
-            هناا نحط الفواتير 
-          </Text>
-        </View>
-
-        <View style={styles.helpContainer}>
-          <TouchableOpacity onPress={handleHelpPress} style={styles.helpLink}>
-            <Text style={styles.helpLinkText}>Help, it didn’t automatically reload!</Text>
-          </TouchableOpacity>
-        </View>
+          )
+          )
+        }
       </ScrollView>
-
+        <Text style={styles.total} >المجموع:                                                    {total} ر.س
+          </Text>
     </View>
+  
   );
 }
 
@@ -157,9 +185,24 @@ const styles = StyleSheet.create({
   navigationFilename: {
     marginTop: 5,
   },
-  helpContainer: {
+  totalContainer: {
+    position: 'absolute', top: 661,
+    backgroundColor: '#fff',
+    alignItems: 'flex-end',
+  },
+  total: {
+    backgroundColor: '#fff',
+    padding: 20,
+    fontSize: 20,
     marginTop: 15,
-    alignItems: 'center',
+    alignItems: 'stretch',
+  },
+  totalNum: {
+    fontSize: 20,
+    backgroundColor: 'red',
+    marginTop: 15,
+    minWidth: 1000,
+    alignItems: 'flex-start',
   },
   helpLink: {
     paddingVertical: 15,

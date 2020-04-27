@@ -5,9 +5,11 @@ import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
 import LinksScreen from '../screens/LinksScreen';
 import ScanScreen from '../screens/ScanScreen';
+import { BillProvider } from '../BillContext'
 
 const BottomTab = createBottomTabNavigator();
-const INITIAL_ROUTE_NAME = 'Home';
+const INITIAL_ROUTE_NAME = 'Scan';
+
 
 export default function BottomTabNavigator({ navigation, route }) {
   // Set the header title on the parent stack navigator depending on the
@@ -16,32 +18,35 @@ export default function BottomTabNavigator({ navigation, route }) {
   navigation.setOptions({ headerTitle: getHeaderTitle(route) });
 
   return (
+    <BillProvider>
     <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
+    <BottomTab.Screen
+        name="Scan"
+        component={ScanScreen}
+        options={{
+          title: 'مسح',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} src={require('../assets/images/cam.png')}/>,
+        }}
+      />
       <BottomTab.Screen
         name="Bill"
         component={HomeScreen}
         options={{
-          title: 'Bill',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-code-working" />,
-        }}
-      />
-      <BottomTab.Screen
-        name="Scan"
-        component={ScanScreen}
-        options={{
-          title: 'Scan Code',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-code-working" />,
+          title: 'الفاتورة',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} src={require('../assets/images/bill.png')} />,
         }}
       />
       <BottomTab.Screen
         name="Links"
         component={LinksScreen}
         options={{
-          title: 'Resources',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-book" />,
+          title: 'مساعدة',
+          titleStyle:'red',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} src={require('../assets/images/help.png')}/>,
         }}
       />
     </BottomTab.Navigator>
+    </BillProvider>
   );
 }
 
@@ -50,10 +55,10 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case 'Bill':
-      return 'Your Bill';
+      return 'الفاتورة الحالية';
       case 'Scan':
-      return 'Scan the QR Code';
+      return 'امسح على كود القطعة';
     case 'Links':
-      return 'Links to learn more';
+      return 'المساعدة ';
   }
 }

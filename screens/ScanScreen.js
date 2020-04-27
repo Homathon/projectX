@@ -1,22 +1,42 @@
 import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { Platform } from 'react-native';
+import { Platform, PixelRatio } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { MonoText } from '../components/StyledText';
 import {
   Text,
   View,
   StyleSheet, Alert, TouchableOpacity,
-  Image, Button
+  Image
 } from 'react-native';
 import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { Button } from 'react-native-elements';
+import BillContext from '../BillContext'
 
 export default function HomeScreen() {
   const [hasPermission, setHasPermission] = React.useState(null);
   const [scanned, setScanned] = React.useState(false);
-  const db = [{ 'code': 6281022180251, 'text': "حليب صافيو - 1.0 ر.س" },
-  { 'code': '-dQ5HyTuSP', 'text': "حليب صافيو - 1.0 ر.س" }]
+  const [newItem, setNewItem] = React.useState({});
+  const [modal, setModal] = React.useState({ display: 'none' });
+  const { list, setList } = React.useContext(BillContext)
+
+  const db = [
+    {
+      name: ' حليب صافيو المراعي صغير',
+      code: 6281022180251,
+      avatar_url: require('../assets/images/milk.jpg'),
+      price: 1.0,
+      quntity: 1,
+    },
+    {
+      name: ' حليب صافيو المراعي صغير',
+      code: '-iPKfvO!w_',
+      avatar_url: require('../assets/images/milk.jpg'),
+      price: 1.0,
+      quntity: 1,
+    }
+  ]
   React.useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
@@ -26,12 +46,18 @@ export default function HomeScreen() {
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    // alert(data)
     for (x in db) {
-      // alert()
-      if (db[x]['code'] == data.substring(data.indexOf('-')))
-        alert(` ${db[x]['text']}`);
+      if (db[x].code == data.substring(data.indexOf('-'))) {
+        setNewItem(db[x])
+        setModal({ display: 'block' })
+      }
     }
+  };
+  const addtoCart = () => {
+    setModal({ display: 'none' })
+    setScanned(false)
+    list.push(newItem)
   };
 
   if (hasPermission === null) {
@@ -72,7 +98,30 @@ export default function HomeScreen() {
         style={StyleSheet.absoluteFillObject}
       />
 
-      {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />}
+      {/* {scanned && <Button title={'Tap to Scan Again'} onPress={() => setScanned(false)} />} */}
+      <View id="myModal" style={[styles.modal, modal]}>
+
+        <View style={styles.modalContent}>
+          <Text style={styles.close}
+            onPress={() => {
+              setModal({ display: 'none' })
+              setScanned(false)
+            }}>&times;
+          </Text>
+          <Image
+            source={newItem.avatar_url}
+            style={{ width: 100, height: 100, marginLeft: 100 }}
+          />
+          <Text style={{ textAlign: 'right', marginBottom: 10 }} >{newItem.name + ' - ' + newItem.price + 'ر.س'}</Text>
+          <Button raised
+            title='أضف للفاتورة'
+            onPress={() => addtoCart()}
+            buttonStyle={{ backgroundColor: '#69CA26' }}
+            containerStyle={{ marginLeft: 50, width: 200, marginBottom: 10 }}
+          />
+        </View>
+
+      </View>
     </View>
   );
 }
@@ -115,6 +164,48 @@ function handleHelpPress() {
 }
 
 const styles = StyleSheet.create({
+  modal: {
+    position: 'absolute', /* Stay in place */
+    zIndex: 1, /* Sit on top */
+    paddingTop: PixelRatio.getPixelSizeForLayoutSize(100), /* Location of the box */
+    left: 0,
+    top: 0,
+    width: '100%', /* Full width */
+    height: '100%', /* Full height */
+    // overflow: 'auto', /* Enable scroll if needed */
+    backgroundColor: 'rgb(0,0,0)', /* Fallback color */
+    backgroundColor: 'rgba(0,0,0,0.4)', /* Black w/ opacity */
+    textAlign: 'center'
+  },
+
+  /* Modal Content */
+  modalContent: {
+    backgroundColor: '#fefefe',
+    margin: 'auto',
+    padding: PixelRatio.getPixelSizeForLayoutSize(2),
+    // border: '1px solid #888',
+    borderRadius: 20,
+    borderColor: '#fefefe',
+    borderWidth: PixelRatio.getPixelSizeForLayoutSize(1),
+    width: '80%',
+    left: 50,
+  },
+
+  /* The Close Button */
+  close: {
+    color: '#aaaaaa',
+    // float: 'right',
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+
+  // close:hover,
+  // close:focus: {
+  //   color: '#000',
+  //   textDecoration: none,
+  //   cursor: pointer,
+  // },
+
   container: {
     flex: 1,
     backgroundColor: '#fff',

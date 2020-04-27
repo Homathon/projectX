@@ -51,7 +51,20 @@ export default function App(props) {
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
           <Stack.Navigator>
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
+            <Stack.Screen 
+              name="امسح على كود القطعة" 
+              component={BottomTabNavigator}
+              options={{
+                title: 'My home',
+                headerStyle: {
+                  backgroundColor: '#9EC88C',
+                },
+                headerTintColor: '#fff',
+                headerTitleStyle: {
+                  fontWeight: 'bold',
+                },
+              }}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </View>
